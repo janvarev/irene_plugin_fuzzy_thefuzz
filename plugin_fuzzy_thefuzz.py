@@ -12,7 +12,7 @@ modname = os.path.basename(__file__)[:-3] # calculating modname
 def start(core:VACore):
     manifest = {
         "name": "Fuzzy text by TheFuzz lib",
-        "version": "1.0",
+        "version": "1.1",
         "require_online": False,
 
         "fuzzy_processor": {
@@ -24,21 +24,26 @@ def start(core:VACore):
 def init(core:VACore):
     pass
 
-def predict(core:VACore, command:str, context:dict): # на входе - команда + текущий контекст в формате Ирины
+def predict(core:VACore, command:str, context:dict, allow_rest_phrase:bool = True): # на входе -
+            # команда; текущий контекст в формате Ирины; разрешен ли остаток фразы, или это фраза целиком
     bestres = 0
     bestret = None
 
     for keyall in context.keys():
         keys = keyall.split("|")
         for key in keys:
-            cmdsub = command[0:len(key)]
-            #print("Subcmd: ",cmdsub,key)
+            if allow_rest_phrase: # разрешены остатки фраз? сравниваем только с началом
+                cmdsub = command[0:len(key)]
+                rest_phrase = command[(len(key)+1):]
+            else:
+                cmdsub = command
+                rest_phrase = ""
+            # print("Subcmd: ",cmdsub,key)
 
             res = fuzz.ratio(cmdsub,key) # для всех ключей вычисляем схожесть
             if res > bestres:
                 bestres = res
-                bestret = (keyall,float(res)/100,command[(len(key)+1):])
-                # возвращаем тройку: ключ команды, уверенность (от 0 до 1), остаток фразы.
+                bestret = (keyall,float(res)/100,rest_phrase)
 
     return bestret
 
