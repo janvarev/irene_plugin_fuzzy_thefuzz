@@ -12,7 +12,7 @@ modname = os.path.basename(__file__)[:-3] # calculating modname
 def start(core:VACore):
     manifest = {
         "name": "Fuzzy text by TheFuzz lib",
-        "version": "1.1",
+        "version": "1.2",
         "require_online": False,
 
         "fuzzy_processor": {
@@ -40,7 +40,7 @@ def predict(core:VACore, command:str, context:dict, allow_rest_phrase:bool = Tru
                 rest_phrase = ""
             # print("Subcmd: ",cmdsub,key)
 
-            res = fuzz.ratio(cmdsub,key) # для всех ключей вычисляем схожесть
+            res = fuzz.WRatio(cmdsub,key) # для всех ключей вычисляем схожесть
             if res > bestres:
                 bestres = res
                 bestret = (keyall,float(res)/100,rest_phrase)
